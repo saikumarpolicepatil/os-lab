@@ -1,129 +1,200 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-void sstf(int RQ[], int n, int initial) {
-    int TotalHeadMovement = 0;
-    int count = 0;
-
+void sstf(int RQ[], int n, int initial, int TotalHeadMovement)
+{     
+    int count = 0,i;
+     printf("Seek Sequence: ");
     while (count != n) {
         int min = 1000, d, index;
 
-        for (int i = 0; i < n; i++) {
+        // Find the nearest request in the queue
+        for (i = 0; i < n; i++) {
             d = abs(RQ[i] - initial);
-            if (d < min) {
+           
+            if (min > d) {
                 min = d;
                 index = i;
             }
         }
 
-        TotalHeadMovement += min;
+        // Print the current request being serviced
+        printf("%d ", RQ[index]);
+
+        // Update total head movement and current head position
+        TotalHeadMovement = TotalHeadMovement + min;
         initial = RQ[index];
-        RQ[index] = -1;  // Mark the request as processed
+
+        // Mark the processed request as visited
+        RQ[index] = 1000;
         count++;
     }
 
-    printf("SSTF - Total head movement: %d\n", TotalHeadMovement);
+    // Output the total head movement
+    printf("\nTotal head movement is %d\n", TotalHeadMovement);
 }
 
-void c_look(int RQ[], int n, int initial) {
-    int TotalHeadMovement = 0;
-    int count = 0;
-    int current_track = initial;
-
-    // Sort the request queue in ascending order
-    for (int i = 0; i < n - 1; i++) {
-        for (int j = 0; j < n - i - 1; j++) {
+void look(int RQ[], int n, int initial, int move, int TotalHeadMovement) 
+{
+    // LOOK logic
+    int i,j,size;
+    printf("Enter total disk size\n");
+    scanf("%d", &size);
+     // Sorting the request array
+    for (i = 0; i < n; i++) {
+        for (j = 0; j < n - i - 1; j++) {
             if (RQ[j] > RQ[j + 1]) {
-                int temp = RQ[j];
+                int temp;
+                temp = RQ[j];
                 RQ[j] = RQ[j + 1];
                 RQ[j + 1] = temp;
             }
         }
     }
 
-    // Find the position of initial track in sorted queue
-    int initial_pos = 0;
-    while (RQ[initial_pos] < initial)
-        initial_pos++;
-
-    // Go forward from initial track to the highest request
-    for (int i = initial_pos; i < n; i++) {
-        TotalHeadMovement += abs(current_track - RQ[i]);
-        current_track = RQ[i];
-        count++;
+    int index;
+    for (i = 0; i < n; i++) {
+        if (initial < RQ[i]) {
+            index = i;
+            break;
+        }
     }
 
-    printf("C-LOOK - Total head movement: %d\n", TotalHeadMovement);
+    printf("Seek Sequence: ");
+    // If movement is towards high value
+    if (move == 1) {
+        for (i = index; i < n; i++) {
+            printf("%d ", RQ[i]);
+            TotalHeadMovement = TotalHeadMovement + abs(RQ[i] - initial);
+            initial = RQ[i];
+        }
+        for (i = index - 1; i >= 0; i--) {
+            printf("%d ", RQ[i]);
+            TotalHeadMovement = TotalHeadMovement + abs(RQ[i] - initial);
+            initial = RQ[i];
+        }
+    }
+    // If movement is towards low value
+    else {
+        for (i = index - 1; i >= 0; i--) {
+            printf("%d ", RQ[i]);
+            TotalHeadMovement = TotalHeadMovement + abs(RQ[i] - initial);
+            initial = RQ[i];
+        }
+        for (i = index; i < n; i++) {
+            printf("%d ", RQ[i]);
+            TotalHeadMovement = TotalHeadMovement + abs(RQ[i] - initial);
+            initial = RQ[i];
+        }
+    }
+
+    // Output the total head movement
+    printf("\nTotal head movement is %d\n", TotalHeadMovement);
 }
 
-void look(int RQ[], int n, int initial) {
-    int TotalHeadMovement = 0;
-    int count = 0;
-    int current_track = initial;
-
-    // Sort the request queue in ascending order
-    for (int i = 0; i < n - 1; i++) {
-        for (int j = 0; j < n - i - 1; j++) {
+void clook(int RQ[], int n, int initial, int move, int TotalHeadMovement)
+{
+    // C-LOOK logic
+    int i,j,size;
+    printf("Enter total disk size\n");
+    scanf("%d", &size);
+    // Sorting the request array
+    for (i = 0; i < n; i++) {
+        for (j = 0; j < n - i - 1; j++) {
             if (RQ[j] > RQ[j + 1]) {
-                int temp = RQ[j];
+                int temp;
+                temp = RQ[j];
                 RQ[j] = RQ[j + 1];
                 RQ[j + 1] = temp;
             }
         }
     }
 
-    // Find the position of initial track in sorted queue
-    int initial_pos = 0;
-    while (RQ[initial_pos] < initial)
-        initial_pos++;
-
-    // Go forward from initial track to the highest request
-    for (int i = initial_pos; i < n; i++) {
-        TotalHeadMovement += abs(current_track - RQ[i]);
-        current_track = RQ[i];
-        count++;
+    int index;
+    for (i = 0; i < n; i++) {
+        if (initial < RQ[i]) {
+            index = i;
+            break;
+        }
     }
 
-    // Go backward from highest request to the lowest request
-    for (int i = initial_pos - 1; i >= 0; i--) {
-        TotalHeadMovement += abs(current_track - RQ[i]);
-        current_track = RQ[i];
-        count++;
+    printf("Seek Sequence: ");
+    // If movement is towards high value
+    if (move == 1) {
+        for (i = index; i < n; i++) {
+            printf("%d ", RQ[i]);
+            TotalHeadMovement = TotalHeadMovement + abs(RQ[i] - initial);
+            initial = RQ[i];
+        }
+        for (i = 0; i < index; i++) {
+            printf("%d ", RQ[i]);
+            TotalHeadMovement = TotalHeadMovement + abs(RQ[i] - initial);
+            initial = RQ[i];
+        }
+    }
+    // If movement is towards low value
+    else {
+        for (i = index - 1; i >= 0; i--) {
+            printf("%d ", RQ[i]);
+            TotalHeadMovement = TotalHeadMovement + abs(RQ[i] - initial);
+            initial = RQ[i];
+        }
+        for (i = n - 1; i >= index; i--) {
+            printf("%d ", RQ[i]);
+            TotalHeadMovement = TotalHeadMovement + abs(RQ[i] - initial);
+            initial = RQ[i];
+        }
     }
 
-    printf("LOOK - Total head movement: %d\n", TotalHeadMovement);
+    // Output the total head movement
+    printf("\nTotal head movement is %d\n", TotalHeadMovement);
 }
 
-int main() {
-    int RQ[100], n, initial,choice;
+int main() 
+{
+    int choice, n, RQ[100], initial, move, i, TotalHeadMovement = 0;
 
-    printf("Enter the number of requests: ");
+    printf("Enter the number of Requests: ");
     scanf("%d", &n);
 
-    printf("Enter the request sequence: ");
-    for (int i = 0; i < n; i++)
+    printf("Enter the Requests sequence: ");
+    for (i = 0; i < n; i++)
         scanf("%d", &RQ[i]);
 
     printf("Enter initial head position: ");
     scanf("%d", &initial);
-    do
-    {
 
-    printf("enter your choice:\n");
-    scanf("%d",&choice);
-    switch(choice)
-    {
-      case 1:sstf(RQ, n, initial);
-             break;
-      case 2:c_look(RQ, n, initial);
-             break;
-      case 3: look(RQ, n, initial);
-             break;
-      default:printf("Exiting...");
-               break;
-    }
-    }while(choice != 4);
+    printf("Enter the head movement direction (1 for high, 0 for low): ");
+    scanf("%d", &move);
 
-    return 0;
+    do {
+        printf("\nChoose the scheduling algorithm:\n");
+        printf("1. SSTF\n2. LOOK\n3. C-LOOK\n4. Exit\n");
+        printf("Enter your choice: ");
+        scanf("%d", &choice);
+
+        switch (choice) {
+            case 1: // SSTF
+                sstf(RQ, n, initial, TotalHeadMovement);
+                break;
+
+            case 2: // LOOK
+                look(RQ, n, initial, move, TotalHeadMovement);
+                break;
+
+            case 3: // C-LOOK
+                clook(RQ, n, initial, move, TotalHeadMovement);
+                break;
+
+            case 4: // Exit
+                printf("Exiting the program.\n");
+                break;
+
+            default:
+                printf("Invalid choice.\n");
+                break;
+        }
+    }while (choice != 4);
+
+   return 0;
 }
-
